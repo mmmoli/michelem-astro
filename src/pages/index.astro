@@ -10,7 +10,8 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 	<head>
 		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
 	</head>
-	<body>
+	<body class="min-h-screen">
+	   <div class="border-2 m-4 border-current">
 		<Header />
 		<main>
 			<h1>🧑‍🚀 Hello, Astronaut!</h1>
@@ -46,5 +47,6 @@ import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
 			</p>
 		</main>
 		<Footer />
+		</div>
 	</body>
 </html>

@@ -9,7 +9,15 @@ const { heading, lead, class: className, ...props } = Astro.props;
 
 ---
 
-<header class:list={['px-6 py-8 md:py-20', className]} {...props}>
-    <h1>{heading}</h1>
-    {lead && <p>{lead}</p>}
+<header class:list={['banner px-6 py-8 md:py-20', className]} {...props}>
+    <div class="max-w-4xl grid gap-4">
+        <h1>{heading}</h1>
+        {lead && <p class="text-xl md:text-3xl font-bold tracking-tight">{lead}.</p>}
+    </div>
 </header>
+
+<style>
+.banner h1 {
+  @apply text-5xl md:text-8xl;
+}
+</style>

@@ -3,7 +3,3 @@ h2,
 h3 {
   @apply font-fancy;
 }
-
-h1 {
-  @apply text-5xl md:text-8xl;
-}
