@@ -1,0 +1,15 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+type Props = HTMLAttributes<'div'> & {
+  heading: string;
+  lead?: string;
+};
+
+const { heading, lead, class: className, ...props } = Astro.props;
+
+---
+
+<header class:list={['px-6 py-8 md:py-20', className]} {...props}>
+    <h1>{heading}</h1>
+    {lead && <p>{lead}</p>}
+</header>
