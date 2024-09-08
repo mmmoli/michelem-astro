@@ -6,7 +6,6 @@ import Prose from '../components/Prose.astro';
 import Banner from '../components/Banner.astro';
 import Footer from '../components/Footer.astro';
 
-
 type Props = CollectionEntry<'blog'>['data'];
 
 const { title, lead, description } = Astro.props;
@@ -21,7 +20,7 @@ const { title, lead, description } = Astro.props;
 		<Header />
 		<Banner heading={title} lead={lead} />
 		<main>
-			<article class="p-6">
+			<article class="p-8 md:p-12">
 				<Prose>
 				    <slot />
 				</Prose>

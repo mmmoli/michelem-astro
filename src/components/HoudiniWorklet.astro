@@ -1,0 +1,22 @@
+---
+type Props =  {
+  workletUrl: string;
+};
+
+const { workletUrl } = Astro.props;
+---
+
+<astro-worklet data-url={workletUrl} />
+
+<script is:inline defer>
+  class HoudiniWorklet extends HTMLElement {
+    connectedCallback() {
+      const workletUrl = this.dataset.url;
+      if ('paintWorklet' in CSS) {
+        // @ts-ignore
+        CSS.paintWorklet.addModule(workletUrl)
+      }
+    }
+  }
+  customElements.define('astro-worklet', HoudiniWorklet);
+</script>

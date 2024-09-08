@@ -1,5 +1,11 @@
 h1,
 h2,
 h3 {
-  @apply font-fancy;
+  @apply font-fancy text-balance;
+}
+
+:root {
+  --powdered-gradient-direction: to-top;
+  --powdered-gradient-color: #a9a9a9;
+  --powdered-gradient-size: 2;
 }

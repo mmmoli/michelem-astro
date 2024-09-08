@@ -9,7 +9,7 @@ const { heading, lead, class: className, ...props } = Astro.props;
 
 ---
 
-<header class:list={['banner px-6 py-8 md:py-20', className]} {...props}>
+<header class:list={['banner px-6 py-8 md:py-20 md:px-12', className]} {...props}>
     <div class="max-w-4xl grid gap-4">
         <h1>{heading}</h1>
         {lead && <p class="text-xl md:text-3xl font-bold tracking-tight">{lead}.</p>}
@@ -19,5 +19,9 @@ const { heading, lead, class: className, ...props } = Astro.props;
 <style>
 .banner h1 {
   @apply text-5xl md:text-8xl;
+}
+
+.banner {
+    background: paint(powdered-gradient);
 }
 </style>
