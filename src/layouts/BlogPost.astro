@@ -17,9 +17,11 @@ const { title, lead, description } = Astro.props;
 	</head>
 
 	<body>
-		<Header />
-		<Banner heading={title} lead={lead} />
-		<main>
+	    <div class="border-4 m-4 border-black">
+	        <Header />
+		<main class="px-8 py-16 grid gap-16">
+		    <Banner heading={title} lead={lead} />
+
 			<article class="p-8 md:p-12">
 				<Prose>
 				    <slot />

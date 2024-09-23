@@ -1,0 +1,170 @@
+---
+title: 'Setting Up a Clean Project Structure in typescript'
+description: 'Using Feature-Sliced Design layers to keep your frontend projects organised and structured.'
+lead: 'Adding Feature-Sliced Design layers to Sveltekit'
+pubDate: 'Sep 21 2024'
+---
+
+import Callout from '../../components/Callout.astro';
+
+Frontend project code structure gets out of hand really quickly.
+
+In this post, I’ll take you through how I set up typescript projects to fit with FSD layers.
+
+I’m going to show you how I try to keep control of the structure to make the project extendable and readable.
+
+I bet, 99% of every frontend post you’ve read, in the last decade, has had a `components/` directory. Tell me I’m wrong.
+
+Work on a decent-sized project, with a couple of team members, and all you need is time to make sure you’re code spins-out of control. I’m taking confusing file-names and imports from anywhere.
+
+I found [feature-sliced design](https://feature-sliced.design/) (”FSD”) 12 months back. It changed how I structure frontend code  for ever.
+
+<Callout heading="Intro to Feature-sliced Design">
+  The idea is that code with a similar function should be co-located together. So instead of putting everything in a components/ directory, you split-up/group components based their purpose.
+</Callout>
+
+
+## Setting up an App
+
+Let’s work with a Sveltekit project but the same applies to Nextjs, solid, etc. See ["sveltekit-fsd-structure" on Github](https://github.com/mmmoli/sveltekit-fsd-structure) to follow-along.
+
+First, mint your fresh Sveltekit app:
+
+```bash
+$ pnpm create svelte@latest sveltekit-fsd-structure
+$ cd sveltekit-fsd-structure
+$ pnpm i
+```
+
+## Creating the path aliases
+
+Next, we need to adjust the paths config so typescript knows where to look when we use a funky import path like `@pages.` This is all done inside `tsconfig.js` which you can find in the project root.
+
+```bash
+	...
+	"strict": true,
+		"moduleResolution": "bundler"
+	}
+	// Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
+	// except $lib which is handled by https://kit.svelte.dev/docs/configuration#files
+	//
+	// If you want to overwrite includes/excludes, make sure to copy over the relevant includes/excludes
+	// from the referenced tsconfig.json - TypeScript does not merge them in
+}
+```
+
+What’s this? A note regarding “Path Aliases”? That’s just what we’re after, let’s follow the  link and read the instructions.
+
+> *An object containing zero or more aliases used to replace values in `import` statements. These aliases are automatically passed to Vite and TypeScript.
+– Sveltekit site*
+>
+
+Fair enough. So we need to update `svelte.config.js` instead:
+
+```bash
+kit: {
+		alias: {
+			'~shared/*': 'src/lib/shared/*',
+			'~entities/*': 'src/lib/entities/*',
+			'~features/*': 'src/lib/features/*',
+			'~widgets/*': 'src/lib/widgets/*',
+			'~pages/*': 'src/lib/pages/*'
+		}
+	}
+```
+
+Here’s how you set up alias for particular directories in Sveltekit. Note the `*`? That what allows you navigate subdirectories. I also decided to prefix my layers with `~`. This was, I know if an import is coming from my app, or from an npm module. You can prefix with anything you want.
+
+<Callout heading="Nextjs Alias Prefix">
+There’s a trap here. Nextjs uses special prefixes for it’s directory routing. This is a totally different thing and shouldn’t be confused with path aliases. For this reason, I personally don’t recommend using `@` and go for `~` instead.
+</Callout>
+
+## Checking the import
+
+Next, we need to make the FSD layer directories. I started with `src/lib/shared/` and made a quick file:
+
+```tsx
+// src/lib/shared/test/index.ts
+export const testValue = 9.999;
+```
+
+Finally, we edit the index page to make sure our imports are working as expected:
+
+```html
+// src/routes/+page.svelte
+
+<script lang="ts">
+	import { testValue } from '~shared/test';
+</script>
+
+<h1>Welcome to SvelteKit2</h1>
+<p>{testValue}</p>
+```
+
+Fire-up the dev server with `$ pnpm run dev` and open the site at http://localhost:5173/.
+
+Congrats, you’re all set-up to follow FSD layers which will keep your project structured and organised as it grows.
+
+## Adding “slices”
+
+FSD breaks down each layer into something that it calls “slices”. Guidance on the FSD site is pretty fast-and-lose here but use slices to organise different concepts (”domains”). e.g.  `auth`, `payment`, `notes`, `aichat`
+
+For our project, we’ll just make some subdirectories. Let’s add a dummy entity called `note`. Create a new .svelte file:
+
+```html
+// src/lib/entities/notes/ui/note-entity.svelte
+
+<script lang="ts">
+	export let content: string;
+</script>
+
+<p>Note: The content is {content}</p>
+```
+
+And the corresponding index file to make it convenient to import:
+
+```tsx
+// src/lib/entities/notes/index.ts
+export { default as NoteEntity } from './ui/note-entity.svelte';
+```
+
+Back on the page, we can use our new entity:
+
+```html
+// src/routes/+page.svelte
+
+<script lang="ts">
+	import { testValue } from '~shared/test';
+	import { NoteEntity } from '~entities/notes';
+</script>
+
+<h1>Welcome to SvelteKit2</h1>
+<p>{testValue}</p>
+
+<hr />
+
+<NoteEntity content="Eat more chips" />
+
+```
+
+Done.
+
+From there, you can build up the FSD layers:
+
+- use Props/slots to compose your components.
+- Add state, hooks and types in `model` and `api` ”segments”
+
+By adopting this structure, I got 3 main benefits from all my projects:
+
+1. **Organised code helps you go faster** – by breaking down the structure into layers and slices, functionality gets co-located and grouped together. This makes it easier to work with because you’re not constantly codebase and it’s great for when new folks join the project and need to get up to speed quickly.
+2. **Refactoring and extending is a breeze** – with everything in one place, it easier to make changes which, when you’re starting out, is exactly when you’re going to be doing the most.
+3. **Reusable functionality** – this last one surprised me in a super positive way. By adopting FSD, core, agnostic functionality was pushed into the `shared` layer. This made it more composable – even between projects! I found that I could c+p entire directories of functionality to get new projects up-to-speed quickly.
+
+All that said, there are some trade-off:
+
+- **Data access gets way more complicated** – FSD is strict with rules regarding importing layers. It forces you to push data access and retrieval down into lower layers (`shared` and `entities`).  In the end, this helps you, but it’s tricky to start because it makes almost every example you see online obsolete.
+- Little EN help – if you don’t speak RU (I don’t) you’re mostly along to trying to figure out how to apply this stuff. The docs site is en english, but the community engages in RU. This means you have to learn from examples out in the wild and that can be tough if they’re not following the strict FSD rules.
+
+I love this this structure. It makes a really clean frontend codebase that got me all kinds of wins. With some simple aliases, you can get your code organised and start building-up those FSD layers. You’ll thank me when your codebase is massive but still under control.
+
+If you do decide to try FSD, make sure to tag your public projects with feature-sliced-design too so others can learn from your set-up.
