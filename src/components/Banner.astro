@@ -10,7 +10,7 @@ const { heading, lead, class: className, ...props } = Astro.props;
 ---
 
 <header class:list={['banner px-6 py-8 md:py-20 md:px-12', className]} {...props}>
-    <div class="max-w-4xl grid gap-4">
+    <div class="max-w-4xl grid grid-cols-1 gap-4">
         <h1>{heading}</h1>
         {lead && <p class="text-xl md:text-3xl font-bold tracking-tight">{lead}.</p>}
     </div>
